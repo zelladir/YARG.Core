@@ -240,6 +240,14 @@ namespace YARG.Core.Chart
 
         public static SongChart FromFile(in ParseSettings settings, string filePath)
         {
+            var extension = System.IO.Path.GetExtension(filePath);
+            if (extension.Equals(".xmk", StringComparison.OrdinalIgnoreCase) ||
+                extension.Equals(".fsgmub", StringComparison.OrdinalIgnoreCase))
+            {
+                var imported = XmkImporter.FromFile(filePath);
+                foreach (var diagnostic in imported.Diagnostics) YargLogger.LogWarning(diagnostic);
+                return imported.Chart;
+            }
             var loader = MoonSongLoader.LoadSong(settings, filePath);
             return new(loader);
         }
