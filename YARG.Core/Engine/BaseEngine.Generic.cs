@@ -86,7 +86,7 @@ namespace YARG.Core.Engine
         /// WARNING: The new chart must be a different difficulty of the original chart, don't go passing in an arbitrary chart.<br/>
         /// </summary>
         /// <param name="chart"></param>
-        public void ReplaceChart(InstrumentDifficulty<TNoteType> chart)
+        public virtual void ReplaceChart(InstrumentDifficulty<TNoteType> chart)
         {
             Chart = chart;
             Notes = chart.Notes;
