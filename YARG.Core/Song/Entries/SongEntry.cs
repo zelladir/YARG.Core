@@ -86,6 +86,10 @@ namespace YARG.Core.Song
         public abstract string ActualLocation { get; }
 
         public HashWrapper Hash => _hash;
+        public int DjQuality { get; protected set; } = -1;
+        public Chart.DjQualityFlags DjFlags { get; protected set; }
+        public bool DjHidden { get; protected set; }
+        public bool HasDjPart(bool includeHidden = false) => _parts.Dj.IsActive() && (includeHidden || !DjHidden);
         public SortString Name => _name;
         public SortString Artist => _artist;
         public SortString Album => _album;
@@ -255,7 +259,7 @@ namespace YARG.Core.Song
 
                     Instrument.ProKeys => _parts.ProKeys,
 
-                    // Instrument.Dj => DJ,
+                    Instrument.DjSingle => _parts.Dj,
 
                     Instrument.Vocals => _parts.LeadVocals,
                     Instrument.Harmony => _parts.HarmonyVocals,
@@ -271,6 +275,7 @@ namespace YARG.Core.Song
         {
             return instrument switch
             {
+                Instrument.DjSingle => HasDjPart(),
                 Instrument.FiveFretGuitar => _parts.FiveFretGuitar.IsActive(),
                 Instrument.FiveFretBass => _parts.FiveFretBass.IsActive(),
                 Instrument.FiveFretRhythm => _parts.FiveFretRhythm.IsActive(),
@@ -314,6 +319,7 @@ namespace YARG.Core.Song
         {
             PartValues? part = instrument switch
             {
+                Instrument.DjSingle => _parts.Dj,
                 Instrument.FiveFretGuitar     => _parts.FiveFretGuitar,
                 Instrument.FiveFretBass       => _parts.FiveFretBass,
                 Instrument.FiveFretRhythm     => _parts.FiveFretRhythm,

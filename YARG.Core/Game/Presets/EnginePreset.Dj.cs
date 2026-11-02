@@ -7,6 +7,10 @@ namespace YARG.Core.Game
     {
         public sealed class DjPreset
         {
+            // Factories avoid sharing mutable preset objects between profiles.
+            public static DjPreset Band() => new() { AutoFadeEuphoria = false, GateOuterLanes = false };
+            // Retains Phase 1b values; DJH2-inspired, not a verified original-game score policy.
+            public static DjPreset StandaloneDjHero2() => new();
             public HitWindowPreset HitWindow = new();
             public DjDeck Deck = DjDeck.Left;
             public bool InvertPlatter, InvertCrossfader, GateOuterLanes;

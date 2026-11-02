@@ -134,7 +134,10 @@ namespace YARG.Core.Song
             using var stream = data.ToReferenceStream();
             if (_chartFormat == ChartFormat.Mid || _chartFormat == ChartFormat.Midi)
             {
-                return SongChart.FromMidi(in parseSettings, MidFileLoader.LoadMidiFile(stream));
+                var chart = SongChart.FromMidi(in parseSettings, MidFileLoader.LoadMidiFile(stream));
+                if (this is UnpackedIniEntry)
+                    DjSidecar.MergeFile(chart, Path.Combine(_location, CHART_FILE_TYPES[(int) _chartFormat].Filename));
+                return chart;
             }
 
             using var reader = new StreamReader(stream);

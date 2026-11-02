@@ -9,12 +9,14 @@ using YARG.Core.Venue;
 using System.Linq;
 using YARG.Core.Logging;
 using YARG.Core.Extensions;
+using YARG.Core.Chart;
 
 namespace YARG.Core.Song
 {
     internal sealed class UnpackedIniEntry : IniSubEntry
     {
         private readonly DateTime? _iniLastWrite;
+        private string _djFingerprint = "";
 
         public override EntryType SubType => EntryType.Ini;
 
@@ -27,6 +29,10 @@ namespace YARG.Core.Song
             {
                 stream.Write(_iniLastWrite.Value.ToBinary(), Endianness.Little);
             }
+            stream.Write(_djFingerprint);
+            stream.Write(DjQuality, Endianness.Little);
+            stream.Write((int) DjFlags, Endianness.Little);
+            stream.Write(DjHidden);
             base.Serialize(stream, node);
         }
 
@@ -304,7 +310,46 @@ namespace YARG.Core.Song
             using var file = FixedArray.LoadFile(chartInfo.FullName);
 
             var result = ScanChart(entry, file, iniModifiers);
+            if (result == ScanResult.Success) entry.ScanDjSidecar();
             return result == ScanResult.Success ? entry : new ScanUnexpected(result);
+        }
+
+        private static string DjFingerprint(string directory)
+        {
+            string path = Path.Combine(directory, "dj.chart");
+            if (!File.Exists(path)) return "";
+            try
+            {
+                if (new FileInfo(path).Length > DjSidecar.MaxSidecarBytes) return "oversize:" + new FileInfo(path).LastWriteTimeUtc.Ticks;
+                return DjSidecar.HashFile(path);
+            }
+            catch (IOException) { return "unreadable"; }
+            catch (UnauthorizedAccessException) { return "unreadable"; }
+        }
+
+        private void ScanDjSidecar()
+        {
+            if (_chartFormat != ChartFormat.Mid && _chartFormat != ChartFormat.Midi) return;
+            _djFingerprint = DjFingerprint(_location);
+            if (_djFingerprint.Length == 0) return;
+            var chart = LoadChart();
+            var info = chart?.DjSidecar;
+            if (info == null) { DjHidden = true; DjFlags = DjQualityFlags.InvalidSidecar; return; }
+            DjQuality = info.Quality; DjHidden = info.Hidden; DjFlags = info.Flags;
+            _parts.Dj.Difficulties = info.Difficulties; // Beginner is independent of Easy.
+            int count = 0;
+            foreach (Difficulty difficulty in new[] { Difficulty.Beginner, Difficulty.Easy, Difficulty.Medium, Difficulty.Hard, Difficulty.Expert })
+                if (chart!.Dj.TryGetDifficulty(difficulty, out var track)) count = Math.Max(count, track.GetTotalNoteCount());
+            _parts.Dj.Intensity = count == 0 ? (sbyte) -1 : (sbyte) Math.Min(6, (int)Math.Ceiling(count / Math.Max(1, chart!.GetEndTime()) / 1.5));
+        }
+
+        private bool ReadDjCache(ref FixedArrayStream stream, bool validate)
+        {
+            _djFingerprint = stream.ReadString();
+            DjQuality = stream.Read<int>(Endianness.Little);
+            DjFlags = (DjQualityFlags) stream.Read<int>(Endianness.Little);
+            DjHidden = stream.ReadBoolean();
+            return !validate || _djFingerprint == (_chartFormat == ChartFormat.Mid || _chartFormat == ChartFormat.Midi ? DjFingerprint(_location) : "");
         }
 
         public static UnpackedIniEntry? TryDeserialize(string baseDirectory, ref FixedArrayStream stream, CacheReadStrings strings)
@@ -333,6 +378,7 @@ namespace YARG.Core.Song
             }
 
             var entry = new UnpackedIniEntry(directory, in chartLastWrite, in iniLastWrite, chart.Format);
+            if (!entry.ReadDjCache(ref stream, true)) return null;
             entry.Deserialize(ref stream, strings);
             return entry;
         }
@@ -344,6 +390,7 @@ namespace YARG.Core.Song
             var chartLastWrite = DateTime.FromBinary(stream.Read<long>(Endianness.Little));
             DateTime? iniLastWrite = stream.ReadBoolean() ? DateTime.FromBinary(stream.Read<long>(Endianness.Little)) : default;
             var entry = new UnpackedIniEntry(directory, in chartLastWrite, in iniLastWrite, chart.Format);
+            entry.ReadDjCache(ref stream, false);
             entry.Deserialize(ref stream, strings);
             return entry;
         }

@@ -44,6 +44,8 @@ namespace YARG.Core.Song
 
         public string GetLeaderboardHash(Instrument instrument, Difficulty difficulty)
         {
+            if (instrument == Instrument.DjSingle)
+                throw new NotSupportedException("DJ ranking requires a versioned DJ chart hash and replay payload.");
             return TryGetBTrackHash(instrument, difficulty, out var result)
                 ? result.Hash
                 : Hash.ToString();

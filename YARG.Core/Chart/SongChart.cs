@@ -23,6 +23,8 @@ namespace YARG.Core.Chart
 
         public List<TextEvent> GlobalEvents { get; set; } = new();
         public List<Section> Sections { get; set; } = new();
+        public bool HasAuthoredSections { get; private set; }
+        public DjSidecarInfo? DjSidecar { get; internal set; }
         public List<CrowdEvent> CrowdEvents { get; set; } = new();
 
         public SyncTrack SyncTrack { get; set; }
@@ -130,6 +132,7 @@ namespace YARG.Core.Chart
             SyncTrack = loader.LoadSyncTrack();
             VenueTrack = loader.LoadVenueTrack();
             Sections = loader.LoadSections();
+            HasAuthoredSections = Sections.Count > 0;
             Lyrics = loader.LoadLyrics();
 
             FiveFretGuitar = loader.LoadGuitarTrack(Instrument.FiveFretGuitar);
@@ -238,7 +241,9 @@ namespace YARG.Core.Chart
                 Harmony = song.Harmony;
         }
 
-        public static SongChart FromFile(in ParseSettings settings, string filePath)
+        public static SongChart FromFile(in ParseSettings settings, string filePath) => FromFile(in settings, filePath, true);
+
+        public static SongChart FromFile(in ParseSettings settings, string filePath, bool mergeDjSidecar)
         {
             var extension = System.IO.Path.GetExtension(filePath);
             if (extension.Equals(".xmk", StringComparison.OrdinalIgnoreCase) ||
@@ -249,7 +254,10 @@ namespace YARG.Core.Chart
                 return imported.Chart;
             }
             var loader = MoonSongLoader.LoadSong(settings, filePath);
-            return new(loader);
+            var chart = new SongChart(loader);
+            if (mergeDjSidecar && (extension.Equals(".mid", StringComparison.OrdinalIgnoreCase) || extension.Equals(".midi", StringComparison.OrdinalIgnoreCase)))
+                Chart.DjSidecar.MergeFile(chart, filePath);
+            return chart;
         }
 
         public static SongChart FromMidi(in ParseSettings settings, MidiFile midi)

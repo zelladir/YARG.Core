@@ -32,7 +32,7 @@ namespace YARG.Core.Song
 
             ProKeys = PartValues.Default,
 
-            // DJ = PartValues.Default,
+            Dj = PartValues.Default,
 
             LeadVocals = PartValues.Default,
             HarmonyVocals = PartValues.Default,
@@ -63,6 +63,8 @@ namespace YARG.Core.Song
         public PartValues ProBass_22Fret;
 
         public PartValues ProKeys;
+
+        public PartValues Dj;
 
         public PartValues LeadVocals;
         public PartValues HarmonyVocals;

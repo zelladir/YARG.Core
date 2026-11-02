@@ -24,7 +24,7 @@ namespace YARG.Core.Game
             Drums = new DrumsPreset();
             Vocals = new VocalsPreset();
             ProKeys = new ProKeysPreset();
-            Dj = new DjPreset();
+            Dj = DjPreset.Band();
         }
 
         public override BasePreset CopyWithNewName(string name)
