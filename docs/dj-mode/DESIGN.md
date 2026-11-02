@@ -1,5 +1,7 @@
 # Single-turntable DJ mode: Phase 1 design
 
+Phase 1c update (2026-11-02): the primary direction is now a DJ player in ordinary MIDI band songs. [BAND-PART.md](BAND-PART.md) defines the implemented deterministic generator, validated `dj.chart` sidecars, unpacked library/cache discovery, quality/visibility, audio routing APIs and current Unity plan. It supersedes standalone-first scope and band-play policy below. Unity audio/gameplay, standalone library discovery and DJ replay/ranking remain future work.
+
 Phase 1b update (2026-11-02): the headless engine and native chart importer are implemented. See [PHASE1B.md](PHASE1B.md) for the actual engine rules, timing contract, validation and remaining limitations, and [XMK.md](XMK.md) for import coverage/provenance. Library discovery, Unity and DJ replay payloads remain deferred. The original Phase 1 design below is retained as historical rationale; its proposed rules are superseded by those implementation documents.
 
 Status: experimental parser foundation, 2026-11-02. This is an independent fork design, not an upstream commitment or a claim to reproduce DJ Hero's scoring exactly. Development used AI assistance.
