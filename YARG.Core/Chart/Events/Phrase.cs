@@ -46,6 +46,13 @@ namespace YARG.Core.Chart
 
         // (Non-Elite) Drums-exclusive phrases
         KickLane,
+
+        // DJ-exclusive phrases (appended to preserve existing values)
+        DjEffectGreen,
+        DjEffectRed,
+        DjEffectBlue,
+        DjEffectAll,
+        DjCrossfadeNull,
     }
 
     /// <summary>

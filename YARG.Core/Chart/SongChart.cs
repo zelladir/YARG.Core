@@ -114,7 +114,7 @@ namespace YARG.Core.Chart
             }
         }
 
-        // public InstrumentTrack<DjNote> Dj { get; set; } = new(Instrument.Dj);
+        public InstrumentTrack<DjNote> Dj { get; set; } = new(Instrument.DjSingle);
 
         // To explicitly allow creation without going through a file
         public SongChart(uint resolution)
@@ -158,7 +158,7 @@ namespace YARG.Core.Chart
             Vocals = loader.LoadVocalsTrack(Instrument.Vocals);
             Harmony = loader.LoadVocalsTrack(Instrument.Harmony);
 
-            // Dj = loader.LoadDjTrack(Instrument.Dj);
+            Dj = loader.LoadDjTrack();
 
             // Ensure beatlines are present
             SyncTrack.FinishLoading(GetLastTick());
@@ -230,6 +230,9 @@ namespace YARG.Core.Chart
 
             if (!song.Vocals.IsEmpty)
                 Vocals = song.Vocals;
+
+            if (!song.Dj.IsEmpty)
+                Dj = song.Dj;
 
             if (!song.Harmony.IsEmpty)
                 Harmony = song.Harmony;
@@ -375,6 +378,8 @@ namespace YARG.Core.Chart
 
             totalStartTime = Math.Min(ProKeys.GetStartTime(), totalStartTime);
 
+            totalStartTime = Math.Min(Dj.GetStartTime(), totalStartTime);
+
             totalStartTime = Math.Min(VoxMin(VocalsTracks), totalStartTime);
 
             // Global
@@ -407,6 +412,8 @@ namespace YARG.Core.Chart
             totalEndTime = Math.Max(TrackMax(ProGuitarTracks), totalEndTime);
 
             totalEndTime = Math.Max(ProKeys.GetEndTime(), totalEndTime);
+
+            totalEndTime = Math.Max(Dj.GetEndTime(), totalEndTime);
 
             totalEndTime = Math.Max(VoxMax(VocalsTracks), totalEndTime);
 
@@ -441,6 +448,7 @@ namespace YARG.Core.Chart
             totalStartTime = Math.Min(TrackMin(DrumsTracks), totalStartTime);
             totalStartTime = Math.Min(TrackMin(ProGuitarTracks), totalStartTime);
             totalStartTime = Math.Min(ProKeys.GetFirstNoteStartTime(), totalStartTime);
+            totalStartTime = Math.Min(Dj.GetFirstNoteStartTime(), totalStartTime);
             totalStartTime = Math.Min(VoxMin(VocalsTracks), totalStartTime);
 
             return totalStartTime;
@@ -461,6 +469,8 @@ namespace YARG.Core.Chart
             totalEndTime = Math.Max(TrackMax(ProGuitarTracks), totalEndTime);
 
             totalEndTime = Math.Max(ProKeys.GetEndTime(), totalEndTime);
+
+            totalEndTime = Math.Max(Dj.GetLastNoteEndTime(), totalEndTime);
 
             totalEndTime = Math.Max(VoxMax(VocalsTracks), totalEndTime);
 
@@ -484,6 +494,8 @@ namespace YARG.Core.Chart
             totalFirstTick = Math.Min(TrackMin(ProGuitarTracks), totalFirstTick);
 
             totalFirstTick = Math.Min(ProKeys.GetFirstTick(), totalFirstTick);
+
+            totalFirstTick = Math.Min(Dj.GetFirstTick(), totalFirstTick);
 
             totalFirstTick = Math.Min(VoxMin(VocalsTracks), totalFirstTick);
 
@@ -517,6 +529,8 @@ namespace YARG.Core.Chart
             totalLastTick = Math.Max(TrackMax(ProGuitarTracks), totalLastTick);
 
             totalLastTick = Math.Max(ProKeys.GetLastTick(), totalLastTick);
+
+            totalLastTick = Math.Max(Dj.GetLastTick(), totalLastTick);
 
             totalLastTick = Math.Max(VoxMax(VocalsTracks), totalLastTick);
 

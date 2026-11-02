@@ -25,6 +25,10 @@ namespace MoonscraperChartEditor.Song
 
         public IReadOnlyList<MoonChart> Charts => charts;
 
+        // DJ has its own event vocabulary and a distinct Beginner difficulty.
+        // Notes remain flat here; MoonSongLoader assembles their chords and links.
+        public Dictionary<YARG.Core.Difficulty, InstrumentDifficulty<DjNote>> DjCharts { get; } = new();
+
         /// <summary>
         /// Read only list of song events.
         /// </summary>

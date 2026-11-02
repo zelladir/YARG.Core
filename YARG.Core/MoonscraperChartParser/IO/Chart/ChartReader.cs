@@ -303,6 +303,9 @@ namespace MoonscraperChartEditor.Song.IO
         private static void SubmitChartData(ref ParseSettings settings, MoonSong song, ReadOnlySpan<char> sectionName,
             AsciiTrimSplitter sectionLines)
         {
+            if (DjChartReader.TryRead(song, sectionName, sectionLines))
+                return;
+
             if (sectionName.Equals(ChartIOHelper.SECTION_EVENTS, StringComparison.Ordinal))
             {
                 YargLogger.LogTrace("Loading events data");

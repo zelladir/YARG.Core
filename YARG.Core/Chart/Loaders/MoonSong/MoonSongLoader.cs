@@ -366,7 +366,7 @@ namespace YARG.Core.Chart
             return flags;
         }
 
-        private void AddNoteToList<TNote>(List<TNote> notes, TNote note)
+        private void AddNoteToList<TNote>(List<TNote> notes, TNote note, bool allowSnap = true)
             where TNote : Note<TNote>
         {
             // The parent of all notes on the current tick
@@ -391,7 +391,7 @@ namespace YARG.Core.Chart
                     currentParent.AddChildNote(note);
                     return;
                 }
-                else if ((note.Tick - currentParent.Tick) <= _settings.NoteSnapThreshold)
+                else if (allowSnap && (note.Tick - currentParent.Tick) <= _settings.NoteSnapThreshold)
                 {
                     // Chord needs to be snapped, copy values
                     note.CopyValuesFrom(currentParent);

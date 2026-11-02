@@ -32,7 +32,7 @@ namespace YARG.Core
         Vocals = 15,
 
         // 20-24: Other
-        // Dj = 20,
+        Dj = 20,
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ namespace YARG.Core
         PartyVocals = 42,
 
         // 50-59: DJ
-        // DjSingle = 50,
+        DjSingle = 50,
         // DjDouble = 51,
 
         Band = byte.MaxValue
@@ -223,7 +223,7 @@ namespace YARG.Core
                 Instrument.Harmony or
                 Instrument.PartyVocals => GameMode.Vocals,
 
-                // Instrument.DjSingle => GameMode.Dj,
+                Instrument.DjSingle => GameMode.Dj,
                 // Instrument.DjDouble => GameMode.Dj,
 
                 _ => throw new NotImplementedException($"Unhandled instrument {instrument}!")
@@ -293,11 +293,7 @@ namespace YARG.Core
                     Instrument.Harmony,
                     Instrument.PartyVocals
                 },
-                // GameMode.Dj             => new[]
-                // {
-                //     Instrument.DjSingle,
-                //     Instrument.DjDouble,
-                // },
+                GameMode.Dj => new[] { Instrument.DjSingle },
                 _ => throw new NotImplementedException($"Unhandled game mode {gameMode}!")
             };
         }

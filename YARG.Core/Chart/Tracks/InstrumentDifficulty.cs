@@ -81,7 +81,9 @@ namespace YARG.Core.Chart
 
             totalEndTime = Math.Max(Notes.GetNoteEndTime(), totalEndTime);
 
-            totalEndTime = Math.Max(Phrases.GetEndTime(), totalEndTime);
+            // Zones can overlap; the last start does not necessarily have the last end.
+            foreach (var phrase in Phrases)
+                totalEndTime = Math.Max(phrase.TimeEnd, totalEndTime);
             totalEndTime = Math.Max(TextEvents.GetEndTime(), totalEndTime);
 
             return totalEndTime;
@@ -112,8 +114,13 @@ namespace YARG.Core.Chart
         {
             uint totalLastTick = 0;
 
-            totalLastTick = Math.Max(Notes.GetLastTick(), totalLastTick);
-            totalLastTick = Math.Max(Phrases.GetLastTick(), totalLastTick);
+            foreach (var parent in Notes)
+            {
+                foreach (var note in parent.AllNotes)
+                    totalLastTick = Math.Max(note.TickEnd, totalLastTick);
+            }
+            foreach (var phrase in Phrases)
+                totalLastTick = Math.Max(phrase.TickEnd, totalLastTick);
             totalLastTick = Math.Max(TextEvents.GetLastTick(), totalLastTick);
 
             return totalLastTick;

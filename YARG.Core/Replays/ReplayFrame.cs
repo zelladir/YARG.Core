@@ -60,6 +60,8 @@ namespace YARG.Core.Replays
                     EngineParameters = new KeysEngineParameters(ref stream, version);
                     Stats = new KeysStats(ref stream, version);
                     break;
+                case GameMode.Dj:
+                    throw new NotSupportedException("DJ replay payloads are not supported yet.");
                 default:
                     throw new InvalidOperationException("Stat creation not implemented.");
             }
@@ -78,6 +80,9 @@ namespace YARG.Core.Replays
 
         public void Serialize(BinaryWriter writer)
         {
+            if (Profile.GameMode == GameMode.Dj)
+                throw new NotSupportedException("DJ replay payloads are not supported yet.");
+
             FRAME_TAG.Serialize(writer);
             Profile.Serialize(writer);
             EngineParameters.Serialize(writer);
